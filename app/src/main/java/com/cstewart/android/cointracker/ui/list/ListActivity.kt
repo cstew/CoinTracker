@@ -21,8 +21,8 @@ class ListActivity : AppCompatActivity() {
     @Inject
     lateinit var repository: CoinRepository
 
-    lateinit private var recyclerView: RecyclerView
-    lateinit private var adapter: SymbolAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: SymbolAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +40,9 @@ class ListActivity : AppCompatActivity() {
         val viewModel = ViewModelProviders.of(this, factory).get(ListViewModel::class.java)
 
         viewModel.getSymbols().observe(this, Observer {
-            adapter.swapSymbols(it!!)
+            it?.let {
+                adapter.swapSymbols(it)
+            }
         })
     }
 
