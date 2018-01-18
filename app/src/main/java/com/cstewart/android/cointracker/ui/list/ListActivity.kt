@@ -21,8 +21,8 @@ class ListActivity : AppCompatActivity() {
     @Inject
     lateinit var repository: CoinRepository
 
-    var recyclerView: RecyclerView? = null
-    var adapter: SymbolAdapter? = null
+    lateinit private var recyclerView: RecyclerView
+    lateinit private var adapter: SymbolAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,27 +30,27 @@ class ListActivity : AppCompatActivity() {
 
         CoinApplication.graph.inject(this)
 
-        recyclerView = findViewById(R.id.recyclerView)
-        recyclerView!!.layoutManager = LinearLayoutManager(this)
-
         adapter = SymbolAdapter(emptyList())
-        recyclerView!!.adapter = adapter
+
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
 
         val factory = ListViewModelFactory(repository)
         val viewModel = ViewModelProviders.of(this, factory).get(ListViewModel::class.java)
 
         viewModel.getSymbols().observe(this, Observer {
-            adapter?.swapSymbols(it!!)
+            adapter.swapSymbols(it!!)
         })
     }
 
-    class SymbolAdapter(var symbols: List<Symbol>) : RecyclerView.Adapter<SymbolHolder>() {
-        override fun onBindViewHolder(holder: SymbolHolder?, position: Int) {
-            holder!!.textView.text = symbols[position].name
+    class SymbolAdapter(private var symbols: List<Symbol>) : RecyclerView.Adapter<SymbolHolder>() {
+        override fun onBindViewHolder(holder: SymbolHolder, position: Int) {
+            holder.textView.text = symbols[position].name
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): SymbolHolder {
-            val inflater = LayoutInflater.from(parent!!.context)
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SymbolHolder {
+            val inflater = LayoutInflater.from(parent.context)
             val view = inflater.inflate(R.layout.list_item_symbol, parent, false)
             return SymbolHolder(view)
         }
@@ -66,11 +66,6 @@ class ListActivity : AppCompatActivity() {
     }
 
     class SymbolHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val textView: TextView
-
-        init {
-            textView = view.findViewById(R.id.textView)
-        }
-
+        val textView: TextView = view.findViewById(R.id.textView)
     }
 }
